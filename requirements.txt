@@ -1,0 +1,9 @@
+streamlit
+requests
+flask
+gunicorn
+streamlit
+yt-dlp
+whisper
+ollama
+reportlab
