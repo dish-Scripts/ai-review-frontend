@@ -3,6 +3,9 @@ import os
 import ollama
 from concurrent.futures import ThreadPoolExecutor
 
+os.makedirs("audios", exist_ok=True)
+os.makedirs("transcripts", exist_ok=True)
+
 def summarize_single_file(file):
     transcript_path = os.path.join("transcripts", file)
     summary_path = os.path.join("summaries", file)
