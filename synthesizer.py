@@ -1,10 +1,9 @@
-# synthesizer.py
 import os
-import ollama
+import httpx  # instead of ollama
 
 def generate_meta_review(summary_folder="summaries", output_file="report.txt"):
     summaries = []
-
+        
     # Collect all summaries
     for file in sorted(os.listdir(summary_folder)):
         if file.endswith(".txt"):
@@ -12,7 +11,7 @@ def generate_meta_review(summary_folder="summaries", output_file="report.txt"):
             with open(path, "r", encoding="utf-8") as f:
                 content = f.read()
             summaries.append(f"Review from {file.replace('.txt', '')}:\n{content.strip()}\n")
-
+   
     # Combine summaries
     combined_input = "\n\n".join(summaries)
 
@@ -35,19 +34,16 @@ Summaries:
 {combined_input}
 """
 
-    # Run LLM
-    response = ollama.chat(
-        model="gemma:2b",
-        messages=[{"role": "user", "content": prompt}],
-        stream=True  # live streaming
-    )
+    # 🔁 Replace ollama with Render backend call
+    base_url = "https://YOUR-BACKEND-URL.onrender.com/synthesize"  # Replace with your actual backend URL
 
-    # Save + stream to console
-    with open(output_file, "w", encoding="utf-8") as f:
-        for chunk in response:
-            content = chunk.get("message", {}).get("content", "")
-            print(content, end="", flush=True)
-            f.write(content)
+    with httpx.stream("POST", base_url, json={"prompt": prompt}, timeout=120.0) as response:
+        response.raise_for_status()
+
+        with open(output_file, "w", encoding="utf-8") as f:
+            for chunk in response.iter_text():
+                print(chunk, end="", flush=True)
+                f.write(chunk)
 
     print(f"\n\n📄 Saved file: {output_file}")
 
