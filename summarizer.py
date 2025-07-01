@@ -3,6 +3,8 @@ import os
 import ollama
 from concurrent.futures import ThreadPoolExecutor
 
+summary_folder = "summaries"
+os.makedirs(summary_folder, exist_ok=True)
 os.makedirs("audios", exist_ok=True)
 os.makedirs("transcripts", exist_ok=True)
 
