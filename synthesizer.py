@@ -1,8 +1,6 @@
 import os
 import requests
 
-BACKEND_URL = "https://ai-review-synthesizer-3.onrender.com"
-
 def generate_meta_review(summary_folder="summaries", output_file="report.txt"):
     summaries = []
 
@@ -36,19 +34,22 @@ Summaries:
 {combined_input}
 """
 
-    # Call backend API
-    response = requests.post(
-        f"{BACKEND_URL}/generate-meta-review",
-        json={"prompt": prompt},
-        stream=True
-    )
+    # Call your FastAPI backend
+    try:
+        response = requests.post(
+            "https://ai-review-backend-0iek.onrender.com/generate",
+            json={"prompt": prompt},
+            timeout=60  # avoid hanging forever
+        )
+        response.raise_for_status()
+        result = response.json()["response"]
 
-    # Save + stream
-    with open(output_file, "w", encoding="utf-8") as f:
-        for line in response.iter_lines(decode_unicode=True):
-            if line:
-                print(line)
-                f.write(line + "\n")
+        # Save to file + print
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(result)
+        print(result)
+        print(f"\n\n📄 Saved file: {output_file}")
 
-    print(f"\n\n📄 Saved file: {output_file}")
+    except requests.exceptions.RequestException as e:
+        print("❌ Error communicating with backend:", e)
 
