@@ -23,3 +23,4 @@ def convert_text_to_pdf(text):
     c.save()
     buffer.seek(0)
     return buffer
+
